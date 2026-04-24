@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Dashboard | ThinkIQ</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="dashboard">
+  <div class="sidebar">
+    <h2>User Panel</h2>
+    <button onclick="showAvailableQuizzes()">Available Quizzes</button>
+    <button onclick="showMyResults()">My Report</button>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <div class="content" id="content">
+    <h2>Welcome!</h2>
+    <p>Click "Available Quizzes" to start a quiz.</p>
+  </div>
+</div>
+
+<script>
+  let currentQuiz = null;
+  let timerInterval = null;
+  let timeLeft = 60;
+
+  // Auth guard
+  (async function() {
+    const res = await fetch('api/auth/me');
+    if (!res.ok) { window.location.href = 'login.html'; return; }
+    const data = await res.json();
+    if (data.user.role !== 'user') window.location.href = 'admindashboard.html';
+    document.querySelector('.sidebar h2').textContent = `Hi, ${data.user.name}`;
+  })();
+
+  async function logout() {
+    await fetch('api/auth/logout', { method: 'POST' });
+    window.location.href = 'login.html';
+  }
+
+  async function showAvailableQuizzes() {
+    const res = await fetch('api/quizzes');
+    const quizzes = await res.json();
+
+    let html = '<h2>Available Quizzes</h2>';
+    if (quizzes.length === 0) {
+      html += '<p>No quizzes available yet. Check back later!</p>';
+    } else {
+      quizzes.forEach(quiz => {
+        html += `
+          <div class="quiz-card">
+            <b>${quiz.title}</b><br>
+            <small>${quiz.question_count} questions</small>
+            <br><br>
+            <button onclick="startQuiz(${quiz.id})" style="width:auto;padding:8px 20px;">Start Quiz</button>
+          </div>
+        `;
+      });
+    }
+    document.getElementById('content').innerHTML = html;
+  }
+
+  async function startQuiz(id) {
+    const res = await fetch(`api/quizzes/${id}`);
+    if (!res.ok) return alert('Quiz not found');
+    currentQuiz = await res.json();
+    timeLeft = currentQuiz.questions.length * 30; // 30 sec per question
+    renderQuiz();
+
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      const el = document.getElementById('timer');
+      if (el) el.textContent = timeLeft;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        submitQuiz();
+      }
+    }, 1000);
+  }
+
+  function renderQuiz() {
+    if (!currentQuiz) return;
+    let html = `
+      <div class="timer">⏱ Time Left: <span id="timer">${timeLeft}</span> sec</div>
+      <h2>${currentQuiz.title}</h2>
+    `;
+
+    currentQuiz.questions.forEach((q, i) => {
+      html += `
+        <div class="quiz-card">
+          <p><b>Q${i + 1}. ${q.question_text}</b></p>
+          <label><input type="radio" name="q${q.id}" value="${q.option1}"> ${q.option1}</label><br>
+          <label><input type="radio" name="q${q.id}" value="${q.option2}"> ${q.option2}</label><br>
+          <label><input type="radio" name="q${q.id}" value="${q.option3}"> ${q.option3}</label><br>
+          <label><input type="radio" name="q${q.id}" value="${q.option4}"> ${q.option4}</label>
+        </div><br>
+      `;
+    });
+
+    html += `<button onclick="submitQuiz()" style="width:auto;padding:10px 30px;">Submit Quiz</button>`;
+    document.getElementById('content').innerHTML = html;
+  }
+
+  async function submitQuiz() {
+    if (!currentQuiz) return;
+    clearInterval(timerInterval);
+
+    const answers = {};
+    currentQuiz.questions.forEach(q => {
+      const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
+      if (selected) answers[q.id] = selected.value;
+    });
+
+    const res = await fetch(`api/quizzes/${currentQuiz.id}/submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ answers })
+    });
+
+    const data = await res.json();
+    if (!res.ok) return alert(data.message || 'Error submitting quiz');
+
+    alert(`Quiz Submitted!\nScore: ${data.score} / ${data.total}`);
+    currentQuiz = null;
+    showAvailableQuizzes();
+  }
+
+  async function showMyResults() {
+    const res = await fetch('api/results/mine');
+    const results = await res.json();
+
+    let html = '<h2>My Results</h2>';
+    if (results.length === 0) {
+      html += '<p>You have not attempted any quizzes yet.</p>';
+    } else {
+      results.forEach(r => {
+        const pct = Math.round((r.score / r.total) * 100);
+        const color = pct >= 70 ? '#48bb78' : pct >= 40 ? '#ed8936' : '#e53e3e';
+        html += `
+          <div class="quiz-card">
+            <b>${r.quiz}</b><br>
+            Score: <span style="color:${color};font-weight:bold;">${r.score} / ${r.total} (${pct}%)</span><br>
+            <small>${new Date(r.submitted_at).toLocaleString()}</small>
+          </div>
+        `;
+      });
+    }
+    document.getElementById('content').innerHTML = html;
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,202 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background:linear-gradient(10deg,#667eea,white);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.container{
+    width:900px;
+    background:#fff;
+    border-radius:20px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.3);
+    overflow:hidden;
+}
+
+.login-container,
+.register-container{
+    display:flex;
+    height:550px;
+}
+
+/* ---------- LEFT PANEL ---------- */
+.left{
+    flex:1;
+    background:linear-gradient(10deg,#667eea,#65408a);
+    color:white;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    padding:40px;
+    text-align:center;
+}
+
+.left h1{
+    font-size:2.4rem;
+    margin-bottom:12px;
+}
+
+.left p{
+    font-size:1rem;
+    opacity:0.9;
+}
+
+/* ---------- RIGHT PANEL ---------- */
+.right{
+    flex:1;
+    padding:40px 60px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}
+
+.right h2{
+    margin-bottom:1px;
+}
+
+.right form{
+    width:100%;
+    max-width:360px;
+}
+
+/* ---------- FORM ---------- */
+.form-group{
+    margin-bottom:8px;
+}
+
+label{
+    display:block;
+    margin-bottom:6px;
+    color:#555;
+    font-weight:500;
+}
+
+input,
+select{
+    width:100%;
+    padding:11px 14px;
+    border:2px solid #e0e0e0;
+    border-radius:8px;
+    font-size:0.95rem;
+    background:#fff;
+    transition:0.25s ease;
+}
+
+input:focus,
+select:focus{
+    outline:none;
+    border-color:#667eea;
+    box-shadow:0 0 0 3px rgba(102,126,234,0.15);
+}
+
+/* ---------- BUTTON ---------- */
+button{
+    width:100%;
+    padding:13px;
+    margin-top:10px;
+    background:linear-gradient(135deg,#067375,#753caf);
+    border:none;
+    color:white;
+    font-size:1rem;
+    font-weight:600;
+    border-radius:10px;
+    cursor:pointer;
+    transition:0.3s ease;
+}
+
+button:hover{
+    transform:translateY(-1px);
+    box-shadow:0 8px 20px rgba(102,126,234,0.4);
+}
+
+/* ---------- FOOTER ---------- */
+.bottom-text{
+    text-align:center;
+    margin-top:16px;
+    font-size:0.95rem;
+    color:#444;
+}
+
+.bottom-text a{
+    color:#667eea;
+    text-decoration:none;
+    font-weight:600;
+}
+
+.bottom-text a:hover{
+    text-decoration:underline;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media(max-width:900px){
+    .container{
+        width:95%;
+    }
+
+    .login-container,
+    .register-container{
+        flex-direction:column;
+        height:auto;
+    }
+
+    .left{
+        padding:30px;
+    }
+
+    .right{
+        padding:35px 25px;
+    }
+}
+
+/* DASHBOARD */
+
+.dashboard{
+  width:100%;
+  display:flex;
+  min-height:100vh;
+}
+
+.sidebar{
+  width:250px;
+  background:#667eea;
+  color:white;
+  padding:20px;
+}
+
+.sidebar h2{
+  margin-bottom:20px;
+}
+
+.sidebar button{
+  width:100%;
+  margin-bottom:10px;
+}
+
+.content{
+  flex:1;
+  padding:20px;
+  background:#f4f6f9;
+}
+
+.quiz-card{
+  background:white;
+  padding:15px;
+  margin:10px;
+  border-radius:10px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+.timer{
+  font-size:20px;
+  color:red;
+}

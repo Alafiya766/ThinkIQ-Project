@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ThinkIQ | Register</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="register-container">
+    <div class="left">
+      <h1>📝 Register</h1>
+      <p>Create your ThinkIQ account</p>
+    </div>
+
+    <div class="right">
+      <h2>Register</h2>
+
+      <form id="registerForm">
+        <div class="form-group">
+          <label for="role">Register As</label>
+          <select id="role" required>
+            <option value="">Select role</option>
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="fullname">Full Name</label>
+          <input type="text" id="fullname" placeholder="Enter name">
+        </div>
+
+        <div class="form-group">
+          <label for="regEmail">Email</label>
+          <input type="email" id="regEmail" placeholder="Enter email">
+        </div>
+
+        <div class="form-group">
+          <label for="regPassword">Password</label>
+          <input type="password" id="regPassword" placeholder="Create password">
+        </div>
+
+        <div class="form-group">
+          <label for="regConfirm">Confirm Password</label>
+          <input type="password" id="regConfirm" placeholder="Confirm password">
+        </div>
+
+        <button type="submit">Register</button>
+      </form>
+
+      <div class="bottom-text">
+        Already have an account?
+        <a href="login.html">Login</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('registerForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const role = document.getElementById('role').value;
+    const name = document.getElementById('fullname').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value.trim();
+    const confirm = document.getElementById('regConfirm').value.trim();
+
+    if (!role) return alert('Please select a role');
+    if (!name || !email || !password) return alert('All fields are required');
+    if (password !== confirm) return alert('Passwords do not match');
+
+    try {
+      const res = await fetch('api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, role })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) return alert(data.message || 'Registration failed');
+
+      alert('Registration successful!');
+      window.location.href = 'login.html';
+    } catch (err) {
+      alert('Network error. Is the server running?');
+    }
+  });
+</script>
+
+</body>
+</html>

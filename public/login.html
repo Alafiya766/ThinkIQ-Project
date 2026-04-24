@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ThinkIQ | Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="login-container">
+    <div class="left">
+      <h1>🎓 ThinkIQ</h1>
+      <p>Login to continue your quizzes</p>
+    </div>
+
+    <div class="right">
+      <h2>Login</h2>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="loginUser">Email / Username</label>
+          <input type="text" id="loginUser" placeholder="Enter email or username">
+        </div>
+
+        <div class="form-group">
+          <label for="loginPass">Password</label>
+          <input type="password" id="loginPass" placeholder="Enter password">
+        </div>
+
+        <button type="submit">Login</button>
+      </form>
+
+      <div class="bottom-text">
+        Don't have an account?
+        <a href="register.html">Register</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const username = document.getElementById('loginUser').value.trim();
+    const password = document.getElementById('loginPass').value.trim();
+
+    if (!username || !password) return alert('Please fill in all fields');
+
+    try {
+      const res = await fetch('api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) return alert(data.message || 'Login failed');
+
+      alert('Login successful!');
+      if (data.user.role === 'admin') {
+        window.location.href = 'admindashboard.html';
+      } else {
+        window.location.href = 'userdashboard.html';
+      }
+    } catch (err) {
+      alert('Network error. Is the server running?');
+    }
+  });
+</script>
+
+</body>
+</html>
